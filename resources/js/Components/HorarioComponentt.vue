@@ -12,7 +12,7 @@
             {{errorGeneral}}
         </div>
 
-        <form @submit.prevents="enviarFormulario">
+        <form @submit.prevent="enviarFormulario">
             <div class="mb-3">
                 <label class="form-label text-secondary fw-semibold">Correo del docente </label>
                 <input type="email" v-model="formulario.correo_docente" class="form-control">
