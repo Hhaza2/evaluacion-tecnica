@@ -8,19 +8,26 @@ use Illuminate\Support\Facades\DB;
 
 class HorarioController extends Controller
 {
-    public function store(HorariosRequest $request){
-        try {
-            DB::statement('EXEC sp_asignar_horario ?,?,?,?,?', [
-                $request->correo_docente,
-                $request->codigo_asignatura,
-                $request->dia_semana,
-                $request->hora_inicio,
-                $request->hora_fin
-            ]);
 
-            return response()->json(['message' => 'Horario asignado con exito.'], 200);
-        } catch (\Exception $e){
-            return response()->json(['message' => 'Error al asignar: ' . $e->getMessage()], 500);
+    public function show($correo)
+    {
+        $horarios = DB::table('horarios')
+            ->join('docentes', 'horarios.id_docente', '=', 'docentes.id')
+            ->join('asignaturas', 'horarios.id_asignatura', '=', 'asignaturas.id')
+            ->where('docentes.correo', $correo)
+            ->select('horarios.id', 'asignaturas.nombre as asignatura', 'horarios.dia_semana', 'horarios.hora_inicio', 'horarios.hora_fin')
+            ->get();
+
+        return response()->json($horarios);
+    }
+
+    public function destroy($id)
+    {
+        try {
+            DB::table('horarios')->where('id', $id)->delete();
+            return response()->json(['message' => 'Horario eliminado con exito.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al eliminar: ' . $e->getMessage()], 500);
         }
     }
 }
